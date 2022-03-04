@@ -96,10 +96,15 @@ public class ChocolatePlugin {
     private void loadInstances() {
         this.syncManager = new SyncManager(this.redisManager.getRedissonClient(), this);
         this.cacheManager = new CacheManager(this.syncManager);
+        this.syncManager.cleanPlayers();
     }
 
     public void logToConsole(String msg) {
         this.server.getConsoleCommandSource().sendMessage(LegacyComponentSerializer.legacySection().deserialize(StringUtils.getInstance()
                 .colorize(msg)));
+    }
+
+    public void logToConsole(String msg, Exception ex) {
+        this.logger.error(msg, ex);
     }
 }
