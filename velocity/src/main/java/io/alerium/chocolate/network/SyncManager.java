@@ -39,11 +39,12 @@ public class SyncManager {
             return thread;
         });
 
-        Iterator<UUID> iterator = getOnlinePlayersInProxy(this.proxyId).iterator();
-        while (iterator.hasNext()) cleanPlayer(iterator.next());
-
         this.executorService.scheduleAtFixedRate(this::runSyncTask, 1, 1, TimeUnit.SECONDS);
         this.chocolatePlugin.getServer().getEventManager().register(chocolatePlugin, new PlayerListener(chocolatePlugin));
+    }
+
+    public void cleanPlayers(){
+        for (UUID uuid : getOnlinePlayersInProxy(this.proxyId)) cleanPlayer(uuid);
     }
 
     private void runSyncTask() {
@@ -75,6 +76,7 @@ public class SyncManager {
         playerData.setIp(player.getRemoteAddress().getAddress().getHostAddress());
         playerData.setServer(player.getCurrentServer().get().getServerInfo().getName());
         playerData.setLastOnline(Instant.now().toEpochMilli());
+        playerData.setUsername(player.getUsername());
 
         redissonClient.getMap("online:playersData").put(player.getUniqueId(), playerData);
     }
@@ -91,6 +93,7 @@ public class SyncManager {
         playerData.setLastOnline(Instant.now().toEpochMilli());
         playerData.setProxy(null);
         playerData.setServer(null);
+        playerData.setUsername(null);
 
         redissonClient.getMap("online:playersData").put(uuid, playerData);
     }
@@ -132,6 +135,14 @@ public class SyncManager {
         return players != null ? players.values().stream()
                 .filter(playerData -> playerData.getProxy() != null && playerData.getProxy().equalsIgnoreCase(proxy))
                 .map(PlayerData::getUuid)
+                .collect(Collectors.toSet()) : null;
+    }
+
+    public Set<String> getOnlinePlayersUsernameInProxy(String proxy) {
+        Map<UUID, PlayerData> players = redissonClient.getMap("online:playersData");
+        return players != null ? players.values().stream()
+                .filter(playerData -> playerData.getProxy() != null && playerData.getProxy().equalsIgnoreCase(proxy))
+                .map(PlayerData::getUsername)
                 .collect(Collectors.toSet()) : null;
     }
 

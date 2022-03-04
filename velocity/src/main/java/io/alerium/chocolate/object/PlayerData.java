@@ -14,7 +14,7 @@ import java.util.UUID;
 public class PlayerData {
 
     private final UUID uuid;
-    private String ip, server, proxy;
+    private String ip, server, proxy, username;
     private Long lastOnline;
 
 }

@@ -29,7 +29,7 @@ public final class ChocolatePlugin extends JavaPlugin {
 
         this.cacheManager = new CacheManager();
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-        Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "Chocolate", new MessageListener(this));
+        Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "chocolate:main", new MessageListener(this));
         new PAPIExpansion(this).register();
     }
 }

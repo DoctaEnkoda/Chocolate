@@ -28,7 +28,7 @@ public class GlistCommand extends ChocolateCommand {
         }
 
         String proxy = args[0];
-        Set<UUID> playersInProxy = this.chocolatePlugin.getCacheManager().getOnlinePlayersInProxy(proxy);
+        Set<String> playersInProxy = this.chocolatePlugin.getCacheManager().getOnlinePlayerNamesInProxy(proxy);
         if (playersInProxy == null) {
             sendMessage(commandSource, StringUtils.getInstance().replacePlaceholders(Lang.GENERIC$PROXY_NOT_FOUND.getString(),
                     "%proxy%", args[0]));

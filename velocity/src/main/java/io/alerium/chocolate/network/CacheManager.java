@@ -27,6 +27,8 @@ public class CacheManager {
     private final SyncManager syncManager;
     private final Cache<String, Set<UUID>> onlinesPerProxy = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES).build();
+    private final Cache<String, Set<String>> onlinesNamePerProxy = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.MINUTES).build();
     private final Cache<String, Set<UUID>> onlinesPerServer = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES).build();
     private final Cache<String, UUID> uuidCache = CacheBuilder.newBuilder()
@@ -76,6 +78,16 @@ public class CacheManager {
         if (onlinePlayers == null) return null;
 
         this.onlinesPerProxy.put(proxy, onlinePlayers);
+        return onlinePlayers;
+    }
+
+    public Set<String> getOnlinePlayerNamesInProxy(String proxy) {
+        if (this.onlinesNamePerProxy.asMap().containsKey(proxy)) return this.onlinesNamePerProxy.getIfPresent(proxy);
+
+        Set<String> onlinePlayers = this.syncManager.getOnlinePlayersUsernameInProxy(proxy);
+        if (onlinePlayers == null) return null;
+
+        this.onlinesNamePerProxy.put(proxy, onlinePlayers);
         return onlinePlayers;
     }
 
@@ -174,15 +186,15 @@ public class CacheManager {
      * @return A list with the name of every player online
      */
     public Set<String> getOnlinePlayersNames() {
-        Set<UUID> str = null;
+        Set<String> str = null;
         Iterator<String> proxies = this.getProxies().iterator();
 
         while (proxies.hasNext()) {
             String proxy = proxies.next();
-            Set<UUID> players = this.getOnlinePlayersInProxy(proxy);
+            Set<String> players = this.getOnlinePlayerNamesInProxy(proxy);
             if (str == null) str = players;
             else str.addAll(players);
         }
-        return str == null ? Sets.newHashSet() : str.stream().map(this::getPlayerName).collect(Collectors.toSet());
+        return str == null ? Sets.newHashSet() : str;
     }
 }
