@@ -21,6 +21,11 @@ public abstract class ChocolateCommand implements SimpleCommand, CommandMeta {
     public String permission, usage, description;
 
     @Override
+    public Object getPlugin() {
+        return chocolatePlugin;
+    }
+
+    @Override
     public void execute(Invocation invocation) {
         CommandSource commandSource = invocation.source();
         String[] args = invocation.arguments();
